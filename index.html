@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12263A">
+<title>Harbor Desk</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Harbor Desk">
+<style>
+:root{--ink:#12263A;--paper:#F3F6F4;--teal:#1F8A70;--amber:#E8A33D;--line:#C9D3CE;--err:#B3261E;
+font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink)}
+[hidden]{display:none!important}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+/* Login */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:var(--ink)}
+.card{width:100%;max-width:380px;background:var(--paper);border-radius:6px;padding:32px 28px}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.card-head h1{margin:0;font-size:1.7rem;letter-spacing:-.01em}
+.btn-install-subtle{background:transparent;color:var(--teal);border:1.5px solid var(--teal);border-radius:4px;padding:6px 11px;font-size:.85rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-install-subtle:hover{background:var(--teal);color:#fff}
+.card p{margin:0 0 22px;color:#4a5b68}
+label{display:block;font-weight:600;margin:14px 0 6px;font-size:.95rem}
+input[type=text],input[type=password]{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:4px;background:#fff;color:var(--ink)}
+.cap{display:flex;gap:8px;align-items:center}
+canvas{border:1.5px solid var(--line);border-radius:4px;background:#fff;flex:none}
+.ghost{border:1.5px solid var(--line);background:#fff;border-radius:4px;width:44px;height:44px;cursor:pointer;font-size:1.2rem}
+.primary{width:100%;margin-top:22px;padding:12px;border:0;border-radius:4px;background:var(--teal);color:#fff;font-weight:700;cursor:pointer;transition:background .15s}
+.primary:hover{background:#17725d}
+#err{min-height:1.3em;margin:12px 0 0;color:var(--err);font-weight:600;font-size:.92rem}
+
+/* Landing */
+header{background:var(--ink);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:14px 22px}
+header b{font-size:1.1rem}
+.nav-btns{display:flex;gap:10px;align-items:center}
+header button{background:transparent;color:#fff;border:1.5px solid #5c7184;border-radius:4px;padding:8px 14px;cursor:pointer;transition:all .15s}
+header button:hover{background:rgba(255,255,255,0.1)}
+header button.btn-install{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:600;display:inline-flex;align-items:center;gap:6px}
+header button.btn-install:hover{background:#17725d;border-color:#17725d}
+.hero{padding:56px 22px 36px;max-width:860px;margin:0 auto}
+.hero h2{font-size:clamp(2rem,6vw,3.4rem);line-height:1.1;margin:0 0 14px;letter-spacing:-.02em}
+.hero p{font-size:1.1rem;max-width:56ch;color:#3d4f5c;line-height:1.55}
+.grid{max-width:860px;margin:0 auto;padding:0 22px 60px;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.tile{border-left:5px solid var(--teal);background:#fff;padding:18px 18px 20px;display:flex;flex-direction:column}
+.tile:nth-child(2){border-color:var(--amber)}
+.tile h3{margin:0 0 6px}
+.tile p{margin:0;color:#4a5b68;line-height:1.5}
+.btn-install-tile{margin-top:14px;background:var(--teal);color:#fff;border:0;border-radius:4px;padding:9px 14px;font-weight:600;font-size:.9rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:fit-content;transition:background .15s}
+.btn-install-tile:hover{background:#17725d}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 24px;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.25);font-weight:600;font-size:.95rem;z-index:9999;animation:fadeIn .3s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+</style>
+</head>
+<body>
+
+<section id="login" hidden>
+  <div class="card">
+    <div class="card-head">
+      <h1>Harbor Desk</h1>
+      <button type="button" id="loginInstallBtn" class="btn-install-subtle" title="Install Harbor Desk App">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Install App</span>
+      </button>
+    </div>
+    <p>Sign in to continue.</p>
+    <form id="f" autocomplete="off" novalidate>
+      <label for="u">Username</label>
+      <input id="u" type="text" autocapitalize="none" required>
+      <label for="p">Password</label>
+      <input id="p" type="password" required>
+      <label for="c">Type the characters shown</label>
+      <div class="cap">
+        <canvas id="cv" width="170" height="44" aria-label="Captcha image"></canvas>
+        <button type="button" class="ghost" id="rf" aria-label="New captcha">↻</button>
+      </div>
+      <input id="c" type="text" autocapitalize="characters" maxlength="5" style="margin-top:10px" required>
+      <button class="primary" type="submit">Sign in</button>
+      <p id="err" role="alert"></p>
+    </form>
+  </div>
+</section>
+
+<section id="landing" hidden>
+  <header>
+    <b>Harbor Desk</b>
+    <div class="nav-btns">
+      <button type="button" id="headerInstallBtn" class="btn-install" title="Install Harbor Desk App">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Install App</span>
+      </button>
+      <button type="button" id="out">Sign out</button>
+    </div>
+  </header>
+  <div class="hero">
+    <h2>Welcome back, admin.</h2>
+    <p>You are signed in. This landing page opens right after login and works offline once the app is installed on your device.</p>
+  </div>
+  <div class="grid">
+    <div class="tile">
+      <h3>Installable</h3>
+      <p>Add this app to your home screen or desktop for fast offline access.</p>
+      <button type="button" id="tileInstallBtn" class="btn-install-tile">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Install App</span>
+      </button>
+    </div>
+    <div class="tile"><h3>Works offline</h3><p>The service worker keeps the app files cached on your device.</p></div>
+    <div class="tile"><h3>Protected sign-in</h3><p>A captcha is required on every login attempt.</p></div>
+  </div>
+</section>
+
+<script>
+const USER="admin", PASS="admin";
+const $=id=>document.getElementById(id);
+let code="";
+
+function drawCaptcha(){
+  const chars="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  const r=crypto.getRandomValues(new Uint8Array(5));
+  code=[...r].map(n=>chars[n%chars.length]).join("");
+  const cv=$("cv"),x=cv.getContext("2d");
+  x.clearRect(0,0,cv.width,cv.height);
+  x.fillStyle="#fff";x.fillRect(0,0,cv.width,cv.height);
+  for(let i=0;i<6;i++){
+    x.strokeStyle=i%2?"#E8A33D":"#1F8A70";x.lineWidth=1.2;x.beginPath();
+    x.moveTo(Math.random()*170,Math.random()*44);
+    x.bezierCurveTo(Math.random()*170,Math.random()*44,Math.random()*170,Math.random()*44,Math.random()*170,Math.random()*44);
+    x.stroke();
+  }
+  [...code].forEach((ch,i)=>{
+    x.save();
+    x.translate(18+i*30,28+(Math.random()*8-4));
+    x.rotate((Math.random()-.5)*.6);
+    x.font="bold "+(24+Math.random()*6)+"px Georgia,serif";
+    x.fillStyle="#12263A";x.fillText(ch,0,0);
+    x.restore();
+  });
+  for(let i=0;i<40;i++){x.fillStyle="rgba(18,38,58,.35)";x.fillRect(Math.random()*170,Math.random()*44,1.5,1.5)}
+}
+
+function show(loggedIn){
+  $("login").hidden=loggedIn;
+  $("landing").hidden=!loggedIn;
+  if(!loggedIn){drawCaptcha();$("u").focus()}
+}
+
+$("f").addEventListener("submit",e=>{
+  e.preventDefault();
+  const u=$("u").value.trim(),p=$("p").value,c=$("c").value.trim().toUpperCase();
+  const err=$("err");
+  if(!u||!p||!c){err.textContent="Fill in username, password and captcha.";return}
+  if(c!==code){err.textContent="Captcha does not match. Try the new one.";$("c").value="";drawCaptcha();return}
+  if(u!==USER||p!==PASS){err.textContent="Wrong username or password.";$("p").value="";$("c").value="";drawCaptcha();return}
+  err.textContent="";
+  sessionStorage.setItem("auth","1");
+  $("f").reset();
+  show(true);
+});
+$("rf").onclick=()=>{$("c").value="";drawCaptcha()};
+$("out").onclick=()=>{sessionStorage.removeItem("auth");show(false)};
+
+show(sessionStorage.getItem("auth")==="1");
+
+/* ==================== PWA INSTALL LOGIC ==================== */
+let deferredPrompt = null;
+
+function isStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches ||
+         window.navigator.standalone === true ||
+         document.referrer.includes("android-app://");
+}
+
+function updateInstallButtons() {
+  const installed = isStandalone();
+  const installButtons = document.querySelectorAll("#headerInstallBtn, #tileInstallBtn, #loginInstallBtn");
+  installButtons.forEach(btn => {
+    if (!btn) return;
+    if (installed) {
+      btn.style.display = "none";
+    } else {
+      btn.style.display = "inline-flex";
+    }
+  });
+}
+
+function showToast(text) {
+  const t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  updateInstallButtons();
+  console.log("PWA install prompt ready.");
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  updateInstallButtons();
+  showToast("Harbor Desk was successfully installed!");
+  console.log("PWA installed successfully.");
+});
+
+async function triggerInstall() {
+  if (deferredPrompt) {
+    try {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      console.log("Install prompt outcome:", choice.outcome);
+      if (choice.outcome === "accepted") {
+        deferredPrompt = null;
+        updateInstallButtons();
+      }
+    } catch (err) {
+      console.error("Install prompt error:", err);
+    }
+  } else {
+    if (isStandalone()) {
+      showToast("App is already installed and running!");
+    } else {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        alert("To install Harbor Desk on iOS:\n1. Tap the Share button in Safari.\n2. Tap 'Add to Home Screen'.");
+      } else {
+        alert("To install Harbor Desk:\n• Click the Install icon in the browser address bar (top right)\n• Or open browser menu (⋮) -> 'Install Harbor Desk'.\n\nEnsure the app is running on http://localhost or HTTPS for PWA installation.");
+      }
+    }
+  }
+}
+
+document.querySelectorAll("#headerInstallBtn, #tileInstallBtn, #loginInstallBtn").forEach(btn => {
+  btn.addEventListener("click", triggerInstall);
+});
+
+updateInstallButtons();
+
+/* ==================== SERVICE WORKER REGISTRATION ==================== */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(reg => {
+        console.log("ServiceWorker registered:", reg.scope);
+      })
+      .catch(err => {
+        console.warn("ServiceWorker registration failed:", err);
+      });
+  });
+}
+</script>
+</body>
+</html>
